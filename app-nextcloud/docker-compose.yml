@@ -1,0 +1,40 @@
+version: "3.8"
+
+volumes:
+  database:
+  data:
+
+services:
+
+  mariadb:
+    container_name: mariadb
+    image: mariadb
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --skip-innodb-read-only-compressed
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - database:/var/lib/mysql
+    environment:
+      MARIADB_DATABASE: "nextcloud"
+      MARIADB_ROOT_PASSWORD: "iamroot"
+      MARIADB_USER: "nextcloud"
+      MARIADB_PASSWORD: "allthedata"
+
+  nextcloud:
+    container_name: nextcloud
+    image: nextcloud
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - data:/var/www/html
+    depends_on:
+      - mariadb
+    environment:
+      MYSQL_DATABASE : "nextcloud"
+      MYSQL_USER : "nextcloud"
+      MYSQL_PASSWORD : "allthedata"
+      MYSQL_HOST: "mariadb"
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: inthecloud 
